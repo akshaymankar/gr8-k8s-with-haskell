@@ -1,0 +1,16 @@
+* Gr8 K8s with Haskell
+** Hello, I am Akshay
+*** Work at Pivotal
+*** Work a lot with K8s
+*** Not a fan of golang
+** Introducing kubernetes-client/haskell
+*** Simple code
+*** Slightly more complex code
+*** Compare to golang code
+** Library needs help
+*** Authentication and config loading is on its way
+*** All models in one module is not so great
+*** OpenAPI v3/Swagger v3
+*** Cached Informers
+*** More testing
+*** MTL/FreeMonad??
