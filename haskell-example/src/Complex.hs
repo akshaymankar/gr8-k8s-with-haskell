@@ -6,6 +6,7 @@ import Kubernetes.OpenAPI.API.AppsV1
 import Kubernetes.OpenAPI.API.CoreV1
 
 import Control.Monad             ((>=>))
+import Control.Monad.Catch
 import Data.Containers.ListUtils (nubOrd)
 import Data.Function             ((&))
 import Data.List                 (find)
@@ -40,7 +41,7 @@ complex = do
     & catMaybes
     & mapM_ printResultLine
 
-data ResultLine = ResultLine { appLabel :: T.Text
+data ResultLine = ResultLine { appLabel   :: T.Text
                              , ipAdresses :: [T.Text]}
 
 mkResultLine ::
@@ -88,8 +89,9 @@ printResultLine (ResultLine label ips) =
     ipsText []        = "no IP Addresses found"
     ipsText addresses = (T.intercalate ", " addresses)
 
+instance Exception MimeError
 dispatchK8sRequest mgr cfg req = dispatchMime' mgr cfg req
-                                 >>= either (error . mimeError) pure
+                                 >>= either throwM pure
 
 class HasMetadata k where
   objectMeta :: k -> Maybe V1ObjectMeta

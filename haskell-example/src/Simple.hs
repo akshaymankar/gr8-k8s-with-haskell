@@ -5,7 +5,8 @@ import Kubernetes.Client
 import Kubernetes.OpenAPI
 import Kubernetes.OpenAPI.API.CoreV1
 
-import Data.Function      ((&))
+import Control.Monad.Catch
+import Data.Function       ((&))
 import Data.Map
 import GHC.Conc
 import System.Environment
@@ -18,6 +19,7 @@ simple = do
   homeDir <- getEnv "HOME"
   (mgr, cfg) <- kubeClient oidcCache
                 $ KubeConfigFile (homeDir <> "/.kube/config")
+
   podList <- dispatchK8sRequest mgr cfg
              $ listNamespacedPod (Accept MimeJSON) (Namespace "kube-system")
   mapM_ printPodName (v1PodListItems podList)
@@ -27,5 +29,7 @@ printPodName pod = case v1ObjectMetaName =<< v1PodMetadata pod of
                      Nothing   -> print "Name not found"
                      Just name -> T.putStrLn name
 
+instance Exception MimeError
 dispatchK8sRequest mgr cfg req = dispatchMime' mgr cfg req
-                                 >>= either (error . mimeError) pure
+                                 >>= either throwM pure
+
