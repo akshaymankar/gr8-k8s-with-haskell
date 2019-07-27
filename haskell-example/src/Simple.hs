@@ -20,8 +20,9 @@ simple = do
   (mgr, cfg) <- kubeClient oidcCache
                 $ KubeConfigFile (homeDir <> "/.kube/config")
 
-  podList <- dispatchK8sRequest mgr cfg
-             $ listNamespacedPod (Accept MimeJSON) (Namespace "kube-system")
+  podList <- listNamespacedPod (Accept MimeJSON) (Namespace "kube-system")
+             & dispatchMime' mgr cfg
+             & (>>= either throwM pure)
   mapM_ printPodName (v1PodListItems podList)
 
 printPodName :: V1Pod -> IO ()
@@ -30,6 +31,3 @@ printPodName pod = case v1ObjectMetaName =<< v1PodMetadata pod of
                      Just name -> T.putStrLn name
 
 instance Exception MimeError
-dispatchK8sRequest mgr cfg req = dispatchMime' mgr cfg req
-                                 >>= either throwM pure
-
