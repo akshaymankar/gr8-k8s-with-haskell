@@ -49,7 +49,7 @@ func main() {
 	}
 }
 
-type ResultLine struct {
+type resultLine struct {
 	label       string
 	ipAddresses []string
 }
@@ -57,11 +57,11 @@ type ResultLine struct {
 func makeResultLine(
 	pods []corev1.Pod,
 	replicaSets []appsv1.ReplicaSet,
-	deployment appsv1.Deployment) (ResultLine, bool) {
+	deployment appsv1.Deployment) (resultLine, bool) {
 
 	label, ok := deployment.Labels["k8s-app"]
 	if !ok {
-		return ResultLine{}, false
+		return resultLine{}, false
 	}
 
 	ownedReplicaSets := findOwnedReplicaSets(deployment, replicaSets)
@@ -72,7 +72,7 @@ func makeResultLine(
 			ips = append(ips, pod.Status.PodIP)
 		}
 	}
-	return ResultLine{
+	return resultLine{
 		label:       label,
 		ipAddresses: ips,
 	}, true
@@ -106,7 +106,7 @@ func findOwnedPods(replicaSets []appsv1.ReplicaSet, pods []corev1.Pod) []corev1.
 	return ownedPods
 }
 
-func (r ResultLine) print() {
+func (r resultLine) print() {
 	var ipStr string
 	if len(r.ipAddresses) == 0 {
 		ipStr = "no IP Addresses found"
