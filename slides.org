@@ -1,0 +1,104 @@
+#+Title: Gr8 K8s with Haskell
+#+REVEAL_ROOT:  file:///Users/axeman/work/reveal.js-3.8.0
+#+OPTIONS: toc:nil, num:nil
+#+REVEAL_INIT_OPTIONS: width:1200, height:800, margin: 0.1, minScale:0.2, maxScale:2.5, transition:'cube', hash: true
+#+REVEAL_PLUGINS: (markdown notes)
+#+REVEAL_THEME: blood
+#+REVEAL_TITLE_SLIDE: <h1>%t</h1>
+#+REVEAL_HTML: <style>.reveal h1, .reveal h2, .reveal h3, .reveal h4 {text-transform: none;}</style>
+* Hello
+** My Name is Akshay
+   * Software Engineer, Pivotal
+   * Project Eirini
+     * Get CF apps running on K8s
+     * http://eirini.cf
+** Noob Alert
+   * I've been writing haskell on my own
+   * Let me know if I say wrong things
+** Not a fan of golang
+   #+BEGIN_SRC go
+   if err != nil {
+       panic(err)
+   }
+   #+END_SRC
+* So Haskell, How?
+** OpenAPI/Swagger
+#+ATTR_REVEAL: :frag (roll-in)
+   * Kubernetes exports openapi/swagger spec
+   * There is an OpenAPI code generator for haskell
+   * So, the haskell client is generated
+** Generated code is not all
+   * There is also a client library to
+     * Load kubeconfig
+     * Authenticate with OIDC and GCP
+     * Watch K8s resources
+     * Potentially more
+** Where is it?
+   * Hackage
+     * [[https://hackage.haskell.org/package/kubernetes-client-core][kubernetes-client-core]]: Generated Code
+     * [[https://hackage.haskell.org/package/kubernetes-client][kubernetes-client]]: Manually written library
+   * Github: [[https://github.com/kubernetes-client/haskell][kubernetes-client/haskell]]
+* Examples
+** Simple Example
+#+ATTR_REVEAL: :frag (none)
+   - List Pods in a namespace
+   - Print all their names
+** Haskell
+   #+BEGIN_SRC haskell -n
+     main = do
+       oidcCache <- newTVarIO $ fromList []
+       (mgr, cfg) <- kubeClient oidcCache
+                     $ KubeConfigFile "/path/to/kube/config"
+       program mgr cfg
+
+     program mgr cfg = do
+       podList <- listNamespacedPod (Accept MimeJSON) (Namespace "kube-system")
+                  & dispatchMime' mgr cfg
+                  & (>>= either throwM pure)
+       mapM_ printPodName (v1PodListItems podList) where
+         printPodName pod = case v1ObjectMetaName =<< v1PodMetadata pod of
+                              Nothing   -> print "Name not found"
+                              Just name -> T.putStrLn name
+     instance Exception MimeError
+   #+END_SRC
+** Golang
+   #+BEGIN_SRC go -n
+     func main() {
+       config, err := clientcmd.BuildConfigFromFlags("", "/path/to/kube/config")
+       if err != nil { panic(err) }
+       client, err := kubernetes.NewForConfig(config)
+       if err != nil { panic(err) }
+       err = program(client)
+       if err != nil { panic (err) }
+     }
+
+     func program(client kubernetes.Interface) error {
+       podList, err := client.CoreV1().Pods("kube-system").List(metav1.ListOptions{})
+       if err != nil { return err }
+       for _, pod := range podList.Items {
+         if pod.Name != "" {
+           fmt.Println(pod.Name)
+         } else {
+           fmt.Println("Name not found")
+         }
+       }
+     }
+   #+END_SRC
+** Not so simple example
+#+ATTR_REVEAL: :frag (roll-in)
+   - Given
+     - User creates =Deployments= with "k8s-app" label
+     - Each =Deployment= creates a =ReplicaSet=, it could be more than 1 sometimes
+     - Each =ReplicaSet= creates a few =Pods=
+     - Each =Pod= has an IP address
+   - Print
+     - One line for each deployment with the label and the IP addresses of the associated pods
+** Code
+* You can help!
+#+ATTR_REVEAL: :frag (roll-in)
+  * Use it and create issues
+  * Better [[https://github.com/openapitools/openapi-generator/][code generator]]
+  * Support for exec and attach to containers
+  * Cached informers
+  * ...
+* Thanks!

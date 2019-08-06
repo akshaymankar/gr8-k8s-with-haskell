@@ -1,49 +1,43 @@
-module Complex where
+module ComplexEffects where
 
 import Kubernetes.Client.Config
 import Kubernetes.OpenAPI
-import Kubernetes.OpenAPI.API.AppsV1
-import Kubernetes.OpenAPI.API.CoreV1
 
-import Control.Monad             ((>=>))
-import Control.Monad.Catch
-import Data.Function             ((&))
-import Data.Map                  (fromList)
-import Data.Maybe                (mapMaybe)
+import Control.Monad       ((>=>))
+import Data.Function       ((&))
+import Data.Map            (fromList)
+import Data.Maybe          (mapMaybe)
 import GHC.Conc
-import Network.HTTP.Client
 import System.Environment
+
+import Polysemy
+import Effects.Kube
 
 import qualified Data.Map     as Map
 import qualified Data.Text    as T
 import qualified Data.Text.IO as T
 
-complex :: IO ()
-complex = do
+complexWithEffects :: IO ()
+complexWithEffects = do
   oidcCache <- newTVarIO $ fromList []
   homeDir <- getEnv "HOME"
   (mgr, cfg) <- kubeClient oidcCache
                 $ KubeConfigFile (homeDir <> "/.kube/config")
-  program mgr cfg
 
-program :: Manager -> KubernetesClientConfig -> IO ()
-program mgr cfg = do
   let namespace = Namespace "kube-system"
-  pods <- listNamespacedPod (Accept MimeJSON) namespace
-          & dispatchK8sRequest mgr cfg
-          & fmap v1PodListItems
-  replicaSets <- listNamespacedReplicaSet (Accept MimeJSON) namespace
-                 & dispatchK8sRequest mgr cfg
-                 & fmap v1ReplicaSetListItems
-  deployments <- listNamespacedDeployment (Accept MimeJSON) namespace
-                 & dispatchK8sRequest mgr cfg
-                 & fmap v1DeploymentListItems
-  mapMaybe (mkResultLine pods replicaSets) deployments
-    & mapM_ printResultLine
+
+  runM . kubeToIO mgr cfg $ complex namespace
+  >>= mapM_ printResultLine
 
 data ResultLine = ResultLine { appLabel   :: T.Text
-                             , ipAdresses :: [T.Text]
-                             }
+                             , ipAdresses :: [T.Text]}
+
+complex :: Members '[Kube] r => Namespace -> Sem r [ResultLine]
+complex ns = do
+  pods <- v1PodListItems <$> listNamespacedPods ns
+  replicaSets <- v1ReplicaSetListItems <$> listNamespacedReplicaSets ns
+  deployments <- v1DeploymentListItems <$> listNamespacedDeployments ns
+  return $ mapMaybe (mkResultLine pods replicaSets) deployments
 
 mkResultLine ::
   [V1Pod] -> [V1ReplicaSet] -> V1Deployment -> Maybe ResultLine
@@ -92,7 +86,3 @@ instance HasMetadata V1ReplicaSet where
 
 ownerRefs :: HasMetadata k => k -> Maybe [V1OwnerReference]
 ownerRefs = objectMeta >=> v1ObjectMetaOwnerReferences
-
-instance Exception MimeError
-dispatchK8sRequest mgr cfg req = dispatchMime' mgr cfg req
-                                 >>= either throwM pure

@@ -26,19 +26,26 @@ func main() {
 		panic(err)
 	}
 
-	podList, err := client.CoreV1().Pods("kube-system").List(metav1.ListOptions{})
+	err = program(client)
 	if err != nil {
 		panic(err)
+	}
+}
+
+func program(client kubernetes.Interface) error {
+	podList, err := client.CoreV1().Pods("kube-system").List(metav1.ListOptions{})
+	if err != nil {
+		return err
 	}
 
 	rsList, err := client.AppsV1().ReplicaSets("kube-system").List(metav1.ListOptions{})
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	deploymentList, err := client.AppsV1().Deployments("kube-system").List(metav1.ListOptions{})
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	for _, deployment := range deploymentList.Items {
@@ -47,6 +54,7 @@ func main() {
 			line.print()
 		}
 	}
+	return nil
 }
 
 type resultLine struct {

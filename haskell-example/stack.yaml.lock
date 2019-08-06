@@ -21,27 +21,6 @@ packages:
     git: https://github.com/akshaymankar/kubernetes-client-haskell
     commit: 42fa6cf43043e5897ec2748435b9e3895ea24dbe
 - completed:
-    hackage: jsonpath-0.1.0.0@sha256:31d02d90389a69c91494538d0b167618d42aa5c580c7e8b46ef1f7a6df017d10,2010
-    pantry-tree:
-      size: 709
-      sha256: 315582626d72fb37a847fff6bc98a531275cc2c31efab53686ba431f23c63193
-  original:
-    hackage: jsonpath-0.1.0.0
-- completed:
-    hackage: jwt-0.10.0@sha256:d14551b0c357424fb9441ec9a7a9d5b90b13f805fcc9327ba49db548cd64fc29,4180
-    pantry-tree:
-      size: 1027
-      sha256: e0cf95e834d99768ad8a3f7e99246948f0cdd2cfa18813517f540144aea6c3e5
-  original:
-    hackage: jwt-0.10.0
-- completed:
-    hackage: katip-0.8.2.0@sha256:f4dca07531ae5e62d278a788133a7fd0c7b1b62c1891fc7c0214f78c16dfaa4f,4097
-    pantry-tree:
-      size: 1140
-      sha256: 2cdc386a98965fec5e81e3ab4b1c1803ad43846b776250509815d35c810c9159
-  original:
-    hackage: katip-0.8.2.0
-- completed:
     hackage: kubernetes-client-core-0.1.0.1@sha256:8751cc7ba60a9a3adc6b88da67539cd7a5ff42fc3128cb98f3a76033f03ff063,6467
     pantry-tree:
       size: 6855
@@ -55,9 +34,23 @@ packages:
       sha256: 68c285c6365360975d50bbb18cb07755d5ef19af8bf0e998d3ea46d35ef4a4e1
   original:
     hackage: oidc-client-0.4.0.0
+- completed:
+    hackage: http-client-0.5.14@sha256:4880b27d6741e331454a1d4c887d96ce3d7d625322c8433983a4b1cd08538577,5348
+    pantry-tree:
+      size: 2457
+      sha256: 02bcffba9cad572fefb4640f5fc9be68e770b32ab73efcac649db20290994c6d
+  original:
+    hackage: http-client-0.5.14
+- completed:
+    hackage: http-media-0.7.1.3@sha256:481a40a26f71caaa1a9d9bf4c0fabdd4b51847c6bfa59b8e790fa07ef52dfea6,3839
+    pantry-tree:
+      size: 1491
+      sha256: 1ff9d7bb155955ecebf0df823091dc08e540db82a7c39cfa96d130fb474af3b6
+  original:
+    hackage: http-media-0.7.1.3
 snapshots:
 - completed:
-    size: 500539
-    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/lts/13/29.yaml
-    sha256: 006398c5e92d1d64737b7e98ae4d63987c36808814504d1451f56ebd98093f75
-  original: lts-13.29
+    size: 523441
+    url: https://raw.githubusercontent.com/commercialhaskell/stackage-snapshots/master/nightly/2019/8/3.yaml
+    sha256: 096b436543020fde7f0dd0ceb029c4a324977e7e8feb64e6b2a90f7906db21d3
+  original: nightly-2019-08-03

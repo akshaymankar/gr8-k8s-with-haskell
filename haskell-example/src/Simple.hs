@@ -10,6 +10,7 @@ import Data.Function       ((&))
 import Data.Map
 import GHC.Conc
 import System.Environment
+import Network.HTTP.Client (Manager)
 
 import qualified Data.Text.IO as T
 
@@ -19,15 +20,17 @@ simple = do
   homeDir <- getEnv "HOME"
   (mgr, cfg) <- kubeClient oidcCache
                 $ KubeConfigFile (homeDir <> "/.kube/config")
+  program mgr cfg
 
+program :: Manager -> KubernetesClientConfig -> IO ()
+program mgr cfg = do
   podList <- listNamespacedPod (Accept MimeJSON) (Namespace "kube-system")
              & dispatchMime' mgr cfg
              & (>>= either throwM pure)
   mapM_ printPodName (v1PodListItems podList)
-
-printPodName :: V1Pod -> IO ()
-printPodName pod = case v1ObjectMetaName =<< v1PodMetadata pod of
-                     Nothing   -> print "Name not found"
-                     Just name -> T.putStrLn name
+  where
+    printPodName pod = case v1ObjectMetaName =<< v1PodMetadata pod of
+                         Nothing -> putStrLn "Name not found"
+                         Just n  -> T.putStrLn n
 
 instance Exception MimeError

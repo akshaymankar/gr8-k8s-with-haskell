@@ -23,10 +23,11 @@ dependencies:
 - base >= 4.7 && < 5
 - containers
 - exceptions
+- http-client
 - kubernetes-client
 - kubernetes-client-core
+- polysemy
 - text
-- http-client
 
 library:
   source-dirs: src
@@ -60,6 +61,7 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
+    - -Wall
     dependencies:
     - haskell-example
 tests:

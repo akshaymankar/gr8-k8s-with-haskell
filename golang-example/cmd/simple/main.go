@@ -12,9 +12,7 @@ import (
 )
 
 func main() {
-	fmt.Println("hello")
-	home := homedir.HomeDir()
-	kubeconfig := filepath.Join(home, ".kube", "config")
+	kubeconfig := filepath.Join(homedir.HomeDir(), ".kube", "config")
 	config, err := clientcmd.BuildConfigFromFlags("", kubeconfig)
 	if err != nil {
 		panic(err)
@@ -24,9 +22,16 @@ func main() {
 		panic(err)
 	}
 
-	podList, err := client.CoreV1().Pods("kube-system").List(metav1.ListOptions{})
+	err = program(client)
 	if err != nil {
 		panic(err)
+	}
+}
+
+func program(client kubernetes.Interface) error {
+	podList, err := client.CoreV1().Pods("kube-system").List(metav1.ListOptions{})
+	if err != nil {
+		return err
 	}
 	for _, pod := range podList.Items {
 		if pod.Name != "" {
@@ -35,4 +40,5 @@ func main() {
 			fmt.Println("Name not found")
 		}
 	}
+	return nil
 }
