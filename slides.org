@@ -1,10 +1,10 @@
 #+Title: Gr8 K8s with Haskell
-#+REVEAL_ROOT:  file:///Users/axeman/work/reveal.js-3.8.0
+#+REVEAL_ROOT: reveal.js-3.8.0
 #+OPTIONS: toc:nil, num:nil
 #+REVEAL_INIT_OPTIONS: width:1200, height:800, margin: 0.1, minScale:0.2, maxScale:2.5, transition:'cube', hash: true
 #+REVEAL_PLUGINS: (markdown notes)
 #+REVEAL_THEME: blood
-#+REVEAL_TITLE_SLIDE: <h1>%t</h1>
+#+REVEAL_TITLE_SLIDE: <h1>%t</h1><h4>Twitter/Github: akshaymankar</h4>
 #+REVEAL_HTML: <style>.reveal h1, .reveal h2, .reveal h3, .reveal h4 {text-transform: none;}</style>
 * Hello
 ** My Name is Akshay
@@ -102,3 +102,4 @@
   * Cached informers
   * ...
 * Thanks!
+  https://github.com/akshaymankar/gr8-k8s-with-haskell

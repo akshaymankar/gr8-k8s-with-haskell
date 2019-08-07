@@ -64,14 +64,14 @@ podsOfDeployment pods replicaSets deployment = do
                          & mapMaybe (v1ReplicaSetMetadata >=> v1ObjectMetaName)
       in concatMap (filterOwned pods) ownedRSNames
   where
-    isOwner kind name o =
-      (v1OwnerReferenceKind o) == kind
-      && (v1OwnerReferenceName o) == name
+    filterOwned ps rsName = filter (isOwnedBy "ReplicaSet" rsName) ps
     isOwnedBy kind name x =
       ownerRefs x
       & (fmap $ any (isOwner kind name))
       & maybe False id
-    filterOwned ps rsName = filter (isOwnedBy "ReplicaSet" rsName) ps
+    isOwner kind name o =
+      (v1OwnerReferenceKind o) == kind
+      && (v1OwnerReferenceName o) == name
 
 printResultLine :: ResultLine -> IO ()
 printResultLine (ResultLine label ips) =
