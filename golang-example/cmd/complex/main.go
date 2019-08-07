@@ -86,14 +86,20 @@ func makeResultLine(
 	}, true
 }
 
+func matchesAnyOwnerRef(ownerRefs []metav1.OwnerReference, kind, name string) bool {
+	for _, o := range ownerRefs {
+		if o.Kind == kind && o.Name == name {
+			return true
+		}
+	}
+	return false
+}
+
 func findOwnedReplicaSets(deployment appsv1.Deployment, replicaSets []appsv1.ReplicaSet) []appsv1.ReplicaSet {
 	var ownedReplicaSets []appsv1.ReplicaSet
 	for _, rs := range replicaSets {
-		for _, o := range rs.OwnerReferences {
-			if o.Kind == "Deployment" && o.Name == deployment.Name {
-				ownedReplicaSets = append(ownedReplicaSets, rs)
-				break
-			}
+		if matchesAnyOwnerRef(rs.OwnerReferences, "Deployment", deployment.Name) {
+			ownedReplicaSets = append(ownedReplicaSets, rs)
 		}
 	}
 	return ownedReplicaSets
@@ -101,13 +107,10 @@ func findOwnedReplicaSets(deployment appsv1.Deployment, replicaSets []appsv1.Rep
 
 func findOwnedPods(replicaSets []appsv1.ReplicaSet, pods []corev1.Pod) []corev1.Pod {
 	var ownedPods []corev1.Pod
-	for _, pod := range pods {
-		for _, rs := range replicaSets {
-			for _, o := range pod.OwnerReferences {
-				if o.Kind == "ReplicaSet" && o.Name == rs.Name {
-					ownedPods = append(ownedPods, pod)
-					break
-				}
+	for _, rs := range replicaSets {
+		for _, pod := range pods {
+			if matchesAnyOwnerRef(pod.OwnerReferences, "ReplicaSet", rs.Name) {
+				ownedPods = append(ownedPods, pod)
 			}
 		}
 	}

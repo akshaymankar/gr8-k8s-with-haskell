@@ -44,7 +44,6 @@ program mgr cfg = do
 data ResultLine = ResultLine { appLabel   :: T.Text
                              , ipAdresses :: [T.Text]
                              }
-
 mkResultLine ::
   [V1Pod] -> [V1ReplicaSet] -> V1Deployment -> Maybe ResultLine
 mkResultLine pods replicaSets deployment = do

@@ -12,15 +12,15 @@
    * Project Eirini
      * Get CF apps running on K8s
      * http://eirini.cf
-** Noob Alert
-   * I've been writing haskell on my own
-   * Let me know if I say wrong things
 ** Not a fan of golang
    #+BEGIN_SRC go
    if err != nil {
        panic(err)
    }
    #+END_SRC
+** Noob Alert
+   * I've been writing haskell on my own
+   * Let me know if I say wrong things
 * So Haskell, How?
 ** OpenAPI/Swagger
 #+ATTR_REVEAL: :frag (roll-in)
